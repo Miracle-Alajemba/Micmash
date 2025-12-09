@@ -1,0 +1,131 @@
+1. I want to change how a page LOOKS (HTML/CSS)
+If you want to change...	Go to folder: resources/views/
+The Homepage (List of events)	events/index.blade.php
+The Single Event Page (Details, Image, Comments)	events/show.blade.php
+The "Create Event" Form	events/create.blade.php
+The Admin Dashboard (Tables, Approve buttons)	admin/events/index.blade.php
+The Navigation Bar (Links at the top)	layouts/navigation.blade.php
+The Footer (Copyright, Links at the bottom)	layouts/app.blade.php
+The Login / Register Pages	auth/login.blade.php OR auth/register.blade.php
+2. I want to change how the app WORKS (Logic)
+If you want to change...	Go to folder: app/Http/Controllers/
+Saving, Updating, or Deleting Events	EventController.php
+Admin Approvals or Rejections	Admin/AdminEventController.php
+RSVP / Joining Logic	EventRsvpController.php
+Liking Logic	EventLikeController.php
+Comments Logic	EventCommentController.php
+User Deletion	Admin/AdminUserController.php
+3. I want to change DATA settings (Database)
+If you want to change...	Go to file...
+Relationships (e.g., An Event has many Comments)	app/Models/Event.php
+Allowed columns (Fix "Mass Assignment" error)	app/Models/Event.php (Look for $fillable)
+Add a new Column (e.g., adding "Price" to events)	database/migrations/ (You must create a new migration)
+Database Password / Name	.env file (at the very bottom of your project)
+4. I want to change URLS (Routes)
+If you want to change...	Go to file...
+The link address (e.g., changing /events to /activities)	routes/web.php
+Middleware (Who is allowed to see what)	routes/web.php
+🚀 The "Pro Developer" Shortcut (VS Code)
+Stop clicking through folders manually! Do this instead:
+Press Ctrl + P (Windows/Linux) or Cmd + P (Mac).
+A search bar opens at the top.
+Type the name of what you are looking for.
+Examples:
+Type nav -> It will show navigation.blade.php.
+Type web -> It will show web.php.
+Type EventCon -> It will show EventController.php.
+Type show -> It will show events/show.blade.php.
+
+// 4. Store New Event
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'location'    => 'required|string',
+            'date'        => 'required|date|after:today',
+            'time'        => 'required',
+            'category_id' => 'required|exists:event_categories,id',
+            'image'       => ['required', File::types(['jpg', 'jpeg', 'webp', 'png'])->max(2048)],
+            'url'         => 'nullable|active_url',
+            // Speaker validation...
+            'speakers'    => 'nullable|array',
+            'speakers.*.name'  => 'nullable|string|max:255',
+            'speakers.*.role'  => 'nullable|string|max:255',
+            'speakers.*.image' => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            // ✅ SAVING TO 'eventimages' FOLDER ON PUBLIC DISK
+            $file->storeAs('eventimages', $filename, 'public');
+
+            // ✅ SAVING FILENAME TO DATABASE
+            $validated['image'] = $filename;
+        }
+
+        $validated['user_id'] = Auth::id();
+        $validated['status'] = 'pending';
+
+        $event = Event::create($validated);
+
+        // Speakers logic (remains the same)...
+        if ($request->has('speakers')) {
+            foreach ($request->speakers as $index => $speakerData) {
+                if (empty($speakerData['name'])) continue;
+                $speakerImageName = null;
+                if ($request->hasFile("speakers.{$index}.image")) {
+                    $file = $request->file("speakers.{$index}.image");
+                    $speakerImageName = time() . '_spk_' . $index . '_' . $file->getClientOriginalName();
+                    $file->storeAs('speakers', $speakerImageName, 'public');
+                }
+                EventSpeaker::create([
+                    'event_id' => $event->id,
+                    'name'     => $speakerData['name'],
+                    'role'     => $speakerData['role'] ?? null,
+                    'image'    => $speakerImageName,
+                ]);
+            }
+        }
+
+        return redirect()->route('events.index')->with('success', 'Event created successfully!');
+    }
+
+    // 6. Update Event
+    public function update(Request $request, Event $event)
+    {
+        if (Auth::id() !== $event->user_id && !Auth::user()->is_admin) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'required',
+            'location'    => 'required',
+            'date'        => 'required|date',
+            'time'        => 'required',
+            'category_id' => 'required|exists:event_categories,id',
+            'image'       => 'nullable|image|max:2048'
+        ]);
+
+        if ($request->hasFile('image')) {
+            // ✅ DELETE OLD IMAGE FROM 'eventimages'
+            if ($event->image) {
+                Storage::disk('public')->delete('eventimages/' . $event->image);
+            }
+
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            // ✅ SAVE NEW IMAGE TO 'eventimages'
+            $file->storeAs('eventimages', $filename, 'public');
+
+            $validated['image'] = $filename;
+        }
+
+        $event->update($validated);
+
+        return redirect()->route('events.show', $event)->with('success', 'Event updated successfully.');
+    }
