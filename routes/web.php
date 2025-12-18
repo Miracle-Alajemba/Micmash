@@ -6,6 +6,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventRsvpController;
 use App\Http\Controllers\EventLikeController;
 use App\Http\Controllers\EventCommentController;
+use App\Http\Controllers\PaymentController;
 
 // Admin Controllers
 use App\Http\Controllers\Admin\AdminEventController;
@@ -18,7 +19,9 @@ use App\Http\Controllers\Admin\AdminUserController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () { return view('layouts.welcome'); })->name('home');
+Route::get('/', function () {
+    return view('layouts.welcome');
+})->name('home');
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::view('/about', 'about')->name('about');
 /*
@@ -32,14 +35,22 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('events', EventController::class)->except(['index', 'show']);
 
     // Interactions
-    Route::post('/events/{event}/rsvp', [EventRsvpController::class, 'toggle'])->middleware('throttle:5,1')->name('events.rsvp');
+    // Join / Update (POST)
+    Route::post('/events/{event}/rsvp', [EventRsvpController::class, 'store'])->name('events.rsvp');
+    // Leave (DELETE)
+    Route::delete('/events/{event}/rsvp', [EventRsvpController::class, 'destroy'])->name('events.rsvp.destroy');
     Route::post('/events/{event}/like', [EventLikeController::class, 'toggle'])->middleware('throttle:10,1')->name('events.like');
+
     Route::post('/events/{event}/comment', [EventCommentController::class, 'store'])->middleware('throttle:5,1')->name('events.comment');
 
     // User Profile (Default Breeze routes)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Payment Routes
+    Route::post('/pay/{event}', [PaymentController::class, 'initialize'])->name('payment.initialize');
+    Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 });
 
 /*

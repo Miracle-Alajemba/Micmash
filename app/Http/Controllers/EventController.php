@@ -72,6 +72,7 @@ class EventController extends Controller
             'category_id' => 'required|exists:event_categories,id',
             'image'       => ['required', File::types(['jpg', 'jpeg', 'webp', 'png'])->max(2024)],
             'url'         => 'nullable|url',
+            'price'       => 'nullable|numeric|min:0',
 
             // Speaker Validation (Array)
             'speakers'    => 'nullable|array',
@@ -80,7 +81,15 @@ class EventController extends Controller
             'speakers.*.image' => 'nullable|image|max:2048',
         ]);
 
-
+        $validated = $request->validate(
+            [
+                'title'       => 'required|string|max:255',
+                // ... other fields ...
+                'price'       => 'nullable|numeric|min:0',
+            ]
+        );
+        // Ensure it defaults to 0 if empty
+        $validated['price'] = $request->price ?? 0;
 
         if ($request->hasFile('image')) {
 
@@ -124,6 +133,13 @@ class EventController extends Controller
 
             return redirect()->route('events.index')->with('success', 'Event created successfully! Waiting for approval.');
         }
+        $validated = $request->validate([
+            // ... other rules ...
+            'price' => 'nullable|numeric|min:0',
+        ]);
+
+        // If they left it empty, make it 0
+        $validated['price'] = $request->price ?? 0;
     }
     //  Show Edit Form
     public function edit(Event $event)
@@ -152,8 +168,15 @@ class EventController extends Controller
             'time'        => 'required',
             'category_id' => 'required|exists:event_categories,id',
             'image'       => 'nullable|image|max:2048',
-            'url'         => 'nullable|active_url'
+            'url'         => 'nullable|active_url',
+            'price'       => 'nullable|numeric|min:0',
         ]);
+
+        $validated = $request->validate([
+            // ... other fields ...
+            'price' => 'nullable|numeric|min:0',
+        ]);
+
 
         if ($request->hasFile('image')) {
             if ($event->image) {

@@ -30,6 +30,7 @@
                                 <th class="px-4 py-3 text-left">Actions</th>
                                 <th class="px-4 py-3 text-left">Attending</th>
                                 <th class="px-4 py-3 text-left">likes</th>
+                                <th class="px-4 py-3 text-left">guests</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,6 +78,7 @@
                                     </td>
                                     <td class="px-1 py-3 text-sm text-gray-600">{{ $event->rsvps->count() }}</td>
                                     <td class="px-4 py-3 text-sm text-gray-600">{{ $event->likes->count() }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">{{ $event->total_attendees }}</td>
                                 </tr>
                             @empty
                                 <tr>

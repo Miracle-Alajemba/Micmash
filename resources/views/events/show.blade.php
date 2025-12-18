@@ -179,7 +179,6 @@
                                         {{ \Carbon\Carbon::parse($event->time)->format('g:i A') }}
                                     </p>
                                 </div>
-
                             </div>
 
                             <!-- Location -->
@@ -198,11 +197,11 @@
                                     <p class="font-bold text-gray-900">{{ $event->location }}</p>
                                 </div>
                             </div>
-                            <!-- ✅ NEW: Event Link Section -->
+
+                            <!-- Event Link Section -->
                             @if ($event->url)
                                 <div class="mb-8 flex items-start">
                                     <div class="mr-4 rounded-lg bg-indigo-50 p-3 text-indigo-600">
-                                        <!-- Globe/Link Icon -->
                                         <svg class="h-6 w-6" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -219,38 +218,110 @@
                                     </div>
                                 </div>
                             @endif
-                            <!-- End Event Link Section -->
-                            <!-- Action Buttons -->
-                            @auth
-                                <div class="space-y-3">
-                                    <form action="{{ route('events.rsvp', $event) }}" method="POST">
+
+                            <!-- RSVP ACTION CARD -->
+                            <div class="rounded-xl border border-gray-100 bg-gray-50 p-5 shadow-inner">
+                                @auth
+                                    @php
+                                        // Define variables for Authenticated Users
+                                        $userRsvp = $event->rsvps->where('user_id', auth()->id())->first();
+                                        $currentGuests = $userRsvp ? $userRsvp->guests_count : 0;
+                                        $isPaid = $event->price > 0;
+                                    @endphp
+
+                                    <!-- HEADER TEXT -->
+                                    <div class="mb-4 text-center">
+                                        @if ($userRsvp)
+                                            <div
+                                                class="mb-2 inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+                                                ✅ You are going
+                                            </div>
+                                        @else
+                                            <p class="text-sm font-bold text-gray-700">Want to join?</p>
+                                            @if ($isPaid)
+                                                <span
+                                                    class="mt-1 inline-block rounded bg-yellow-100 px-2 py-1 text-xs font-bold text-yellow-800">
+                                                    Ticket Price: ₦{{ number_format($event->price) }} / person
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="mt-1 inline-block rounded bg-blue-100 px-2 py-1 text-xs font-bold text-blue-800">
+                                                    Free Entry
+                                                </span>
+                                            @endif
+                                        @endif
+                                        <p class="mt-2 text-xs text-gray-500">Bringing friends? (Max 5)</p>
+                                    </div>
+
+                                    <!-- THE FORM -->
+                                    {{-- If user hasn't joined AND it costs money, send to Payment. Otherwise, standard RSVP --}}
+                                    <form
+                                        action="{{ $isPaid && !$userRsvp ? route('payment.initialize', $event) : route('events.rsvp', $event) }}"
+                                        method="POST">
                                         @csrf
-                                        <button
-                                            class="{{ $event->isJoinedBy(auth()->user()) ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-indigo-600 text-white hover:bg-indigo-700' }} w-full rounded-xl py-3 text-lg font-bold shadow-md transition">
-                                            {{ $event->isJoinedBy(auth()->user()) ? '✅ You are going' : 'Join Event' }}
+
+                                        <!-- STEPPER UI ( -  0  + ) -->
+                                        <div class="mb-4 flex items-center justify-center space-x-3">
+                                            <!-- MINUS BUTTON -->
+                                            <button type="button" onclick="updateGuestCount(-1)"
+                                                class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-lg font-bold text-gray-600 shadow-sm transition hover:border-indigo-500 hover:bg-gray-100 hover:text-indigo-600">
+                                                -
+                                            </button>
+
+                                            <!-- THE HIDDEN NUMBER INPUT -->
+                                            <div class="relative">
+                                                <span class="absolute left-0 top-0 p-1 text-xs font-bold text-gray-400">Me
+                                                    +</span>
+                                                <input type="number" id="guest_input" name="guests_count"
+                                                    value="{{ $currentGuests }}" min="0" max="5" readonly
+                                                    class="h-12 w-20 rounded-lg border-2 border-indigo-100 bg-white text-center text-xl font-bold text-indigo-700 focus:border-indigo-500 focus:ring-0">
+                                            </div>
+
+                                            <!-- PLUS BUTTON -->
+                                            <button type="button" onclick="updateGuestCount(1)"
+                                                class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-lg font-bold text-gray-600 shadow-sm transition hover:border-indigo-500 hover:bg-gray-100 hover:text-indigo-600">
+                                                +
+                                            </button>
+                                        </div>
+
+                                        <!-- SUBMIT BUTTON -->
+                                        <button id="submit_btn"
+                                            class="w-full transform rounded-xl bg-indigo-600 py-3 text-lg font-bold text-white shadow-md transition hover:bg-indigo-700 hover:shadow-lg active:scale-95">
+                                            @if ($userRsvp)
+                                                Update Guests
+                                            @else
+                                                @if ($isPaid)
+                                                    Pay <span
+                                                        id="total_price_display">₦{{ number_format($event->price) }}</span>
+                                                @else
+                                                    Join Event
+                                                @endif
+                                            @endif
                                         </button>
                                     </form>
 
-                                    <form action="{{ route('events.like', $event) }}" method="POST">
-                                        @csrf
-                                        <button
-                                            class="flex w-full items-center justify-center rounded-xl border border-gray-200 py-2 font-medium text-gray-600 transition hover:bg-gray-50">
-                                            <svg class="{{ $event->isLikedBy(auth()->user()) ? 'text-red-500 fill-current' : 'text-gray-400' }} mr-2 h-5 w-5"
-                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                            </svg>
-                                            {{ $event->likes->count() }} Likes
-                                        </button>
-                                    </form>
-                                </div>
-                            @else
-                                <a href="{{ route('login') }}"
-                                    class="block w-full rounded-xl bg-gray-900 py-3 text-center font-bold text-white transition hover:bg-black">
-                                    Login to Join
-                                </a>
-                            @endauth
+                                    <!-- LEAVE BUTTON (Only if joined) -->
+                                    @if ($userRsvp)
+                                        <form action="{{ route('events.rsvp.destroy', $event) }}" method="POST"
+                                            class="mt-3 text-center">
+                                            @csrf @method('DELETE')
+                                            <button
+                                                class="text-xs font-medium text-red-500 hover:text-red-700 hover:underline">
+                                                Cancel my reservation
+                                            </button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <!-- GUEST STATE -->
+                                    <div class="text-center">
+                                        <p class="mb-3 text-sm text-gray-600">Join the community to RSVP!</p>
+                                        <a href="{{ route('login') }}"
+                                            class="block w-full rounded-xl bg-gray-900 py-3 font-bold text-white transition hover:bg-black">
+                                            Login to Join
+                                        </a>
+                                    </div>
+                                @endauth
+                            </div>
                         </div>
 
                         <!-- Admin/Owner Controls -->
@@ -283,8 +354,55 @@
 
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
+
+    <!-- JAVASCRIPT FOR MATH AND LOGIC -->
+    <script>
+        @auth
+        // VARIABLES FOR LOGGED IN USERS
+        const eventPrice = {{ $event->price ?? 0 }};
+        // Logic: Is it paid? AND User is NOT on the list?
+        const isPaidEvent = {{ $event->price > 0 && !($userRsvp ?? false) ? 'true' : 'false' }};
+        @else
+            // DEFAULTS FOR GUESTS
+            const eventPrice = 0;
+            const isPaidEvent = false;
+        @endauth
+
+        function updateGuestCount(change) {
+            // 1. Get the input field
+            let input = document.getElementById('guest_input');
+            if (!input) return;
+
+            let currentValue = parseInt(input.value);
+
+            // 2. Calculate new value
+            let newValue = currentValue + change;
+
+            // 3. Enforce limits (Min 0, Max 5)
+            if (newValue >= 0 && newValue <= 5) {
+                input.value = newValue;
+
+                // 4. Update Price Display (Only if Paid & New RSVP)
+                if (isPaidEvent) {
+                    let totalPeople = 1 + newValue; // Me + Guests
+                    let totalCost = totalPeople * eventPrice;
+
+                    // Format currency (Naira)
+                    let formatted = new Intl.NumberFormat('en-NG', {
+                        style: 'currency',
+                        currency: 'NGN'
+                    }).format(totalCost);
+
+                    // Update the Button Text
+                    let display = document.getElementById('total_price_display');
+                    if (display) {
+                        display.innerText = formatted;
+                    }
+                }
+            }
+        }
+    </script>
 </x-app-layout>

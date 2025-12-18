@@ -99,7 +99,19 @@
                                         required>
                                 </div>
                             </div>
-
+                            <!-- Price Input -->
+                            <div>
+                                <label class="block font-medium text-gray-700">Ticket Price (₦)</label>
+                                <div class="relative mt-1 rounded-md shadow-sm">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <span class="text-gray-500 sm:text-sm">₦</span>
+                                    </div>
+                                    <input type="number" name="price" value="0" min="0" step="0.01"
+                                        class="block w-full rounded-md border-gray-300 pl-7 focus:border-indigo-500 focus:ring-indigo-500"
+                                        placeholder="0.00 (Leave 0 for Free)">
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">Enter 0 if the event is free.</p>
+                            </div>
                             <!-- Url -->
                             <div>
                                 <label class="mb-1 block text-sm font-medium text-gray-700">Event Url</label>
@@ -154,10 +166,12 @@
                                     class="relative rounded-xl border border-indigo-100 bg-indigo-50 p-5 transition hover:shadow-md">
 
                                     <!-- Remove Button -->
-                                    <button type="button" @click="speakers = speakers.filter(s => s.id !== speaker.id)"
+                                    <button type="button"
+                                        @click="speakers = speakers.filter(s => s.id !== speaker.id)"
                                         class="absolute right-2 top-2 rounded-full bg-white p-1 text-gray-400 shadow-sm transition hover:text-red-500 hover:shadow"
                                         title="Remove">
-                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M6 18L18 6M6 6l12 12">
                                             </path>

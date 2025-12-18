@@ -7,17 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class EventRsvp extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-  protected $fillable = ['user_id', 'event_id'];
+    protected $fillable = ['user_id', 'event_id', 'guests_count'];
 
-  public function user()
-  {
-    return $this->belongsTo(User::class);
-  }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
-  public function event()
-  {
-    return $this->belongsTo(Event::class);
-  }
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 }
