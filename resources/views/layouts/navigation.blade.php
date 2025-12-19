@@ -32,7 +32,9 @@
                 <x-nav-link :href="route('about')" :active="request()->routeIs('home')">
                     {{ __('About us') }}
                 </x-nav-link>
-
+                <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.index')">
+                    {{ __('My Tickets') }}
+                </x-nav-link>
                 <!-- 3. CREATE EVENT -->
                 @auth
                     <x-nav-link :href="route('events.create')" :active="request()->routeIs('events.create')">

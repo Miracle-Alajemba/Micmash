@@ -10,18 +10,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\EventSpeaker;
-use phpDocumentor\Reflection\Types\Nullable;
 
 class EventController extends Controller
 {
-    use AuthorizesRequests; // ✅ Allows use of $this->authorize()
+    use AuthorizesRequests;
 
-    // Show Homepage (Approved events only)
+    // 1. Show Homepage
     public function index(Request $request)
     {
         $query = Event::with('user', 'category')->withCount('rsvps')->where('status', 'approved');
 
-        // Search logic
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%')
                 ->orWhere('location', 'like', '%' . $request->search . '%');
@@ -31,27 +29,23 @@ class EventController extends Controller
         }
 
         $events = $query->latest()->simplepaginate(9);
-
-        $categories = EventCategory::all(); // For the filter dropdown
-
-
+        $categories = EventCategory::all();
 
         return view('events.index', compact('events', 'categories'));
     }
 
-    // Show Single Event Details
+    // 2. Show Details
     public function show(Event $event)
     {
-        // Guests can only see approved events
         if ($event->status !== 'approved' && !Auth::check()) {
             abort(403, 'This event is pending approval.');
         }
 
-        // ✅ FIX: Load everything in one line (User, Category, Comments, RSVPs, Speakers)
         $event->load(['user', 'category', 'comments.user', 'rsvps', 'speakers']);
 
         return view('events.show', compact('event'));
     }
+
     // 3. Show Create Form
     public function create()
     {
@@ -62,7 +56,7 @@ class EventController extends Controller
     // 4. Store New Event
     public function store(Request $request)
     {
-        // Validate Event Details AND Speakers
+        // ✅ ONE SINGLE VALIDATION BLOCK
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'required|string',
@@ -70,47 +64,36 @@ class EventController extends Controller
             'date'        => 'required|date|after:today',
             'time'        => 'required',
             'category_id' => 'required|exists:event_categories,id',
-            'image'       => ['required', File::types(['jpg', 'jpeg', 'webp', 'png'])->max(2024)],
+            'image'       => ['required', File::types(['jpg', 'jpeg', 'webp', 'png'])->max(2048)],
             'url'         => 'nullable|url',
             'price'       => 'nullable|numeric|min:0',
 
-            // Speaker Validation (Array)
+            // Speaker Validation
             'speakers'    => 'nullable|array',
             'speakers.*.name'  => 'nullable|string|max:255',
             'speakers.*.role'  => 'nullable|string|max:255',
             'speakers.*.image' => 'nullable|image|max:2048',
         ]);
 
-        $validated = $request->validate(
-            [
-                'title'       => 'required|string|max:255',
-                // ... other fields ...
-                'price'       => 'nullable|numeric|min:0',
-            ]
-        );
-        // Ensure it defaults to 0 if empty
+        // Default price
         $validated['price'] = $request->price ?? 0;
 
+        // Handle Event Image
         if ($request->hasFile('image')) {
-
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-
-
-            //saving the eventimages folder
+            // Saving to 'storage/app/public/eventimages'
             $file->storeAs('eventimages', $filename, 'public');
-
-            //saving filename to database
             $validated['image'] = $filename;
         }
 
         $validated['user_id'] = Auth::id();
         $validated['status'] = 'pending';
 
+        // Create the event
         $event = Event::create($validated);
 
-        // 3. Loop through and Create Speakers
-        // 3. Loop through Speakers
+        // Handle Speakers
         if ($request->has('speakers')) {
             foreach ($request->speakers as $index => $speakerData) {
                 if (empty($speakerData['name'])) continue;
@@ -120,7 +103,8 @@ class EventController extends Controller
                 if ($request->hasFile("speakers.{$index}.image")) {
                     $file = $request->file("speakers.{$index}.image");
                     $speakerImageName = time() . '_spk_' . $index . '_' . $file->getClientOriginalName();
-                    $file->storeAs('speakers', $speakerImageName, 'public'); // Changed folder to 'speakers' (no 'public/' prefix needed in storeAs if disk is public)
+                    // Saving to 'storage/app/public/speakers'
+                    $file->storeAs('speakers', $speakerImageName, 'public');
                 }
 
                 EventSpeaker::create([
@@ -130,21 +114,15 @@ class EventController extends Controller
                     'image'    => $speakerImageName,
                 ]);
             }
-
-            return redirect()->route('events.index')->with('success', 'Event created successfully! Waiting for approval.');
         }
-        $validated = $request->validate([
-            // ... other rules ...
-            'price' => 'nullable|numeric|min:0',
-        ]);
 
-        // If they left it empty, make it 0
-        $validated['price'] = $request->price ?? 0;
+        // ✅ Redirect is now OUTSIDE the loop so it always runs
+        return redirect()->route('events.index')->with('success', 'Event created successfully! Waiting for approval.');
     }
-    //  Show Edit Form
+
+    // 5. Show Edit Form
     public function edit(Event $event)
     {
-        //  Allow if Owner OR Admin
         if (Auth::id() !== $event->user_id && !Auth::user()->is_admin) {
             abort(403);
         }
@@ -152,14 +130,15 @@ class EventController extends Controller
         $categories = EventCategory::all();
         return view('events.edit', compact('event', 'categories'));
     }
-    //  Update Event
+
+    // 6. Update Event
     public function update(Request $request, Event $event)
     {
-        // Allow if Owner OR Admin
         if (Auth::id() !== $event->user_id && !Auth::user()->is_admin) {
             abort(403, 'Unauthorized action.');
         }
 
+        // ✅ Cleaned up validation (removed duplicate block)
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'required',
@@ -168,23 +147,23 @@ class EventController extends Controller
             'time'        => 'required',
             'category_id' => 'required|exists:event_categories,id',
             'image'       => 'nullable|image|max:2048',
-            'url'         => 'nullable|active_url',
+            'url'         => 'nullable|url',
             'price'       => 'nullable|numeric|min:0',
         ]);
 
-        $validated = $request->validate([
-            // ... other fields ...
-            'price' => 'nullable|numeric|min:0',
-        ]);
-
+        // Default price if not provided
+        $validated['price'] = $request->price ?? 0;
 
         if ($request->hasFile('image')) {
+            // Delete old image
             if ($event->image) {
-                Storage::delete('public/events/' . $event->image);
+                Storage::disk('public')->delete('eventimages/' . $event->image);
             }
+
             $filename = time() . '_' . $request->file('image')->getClientOriginalName();
 
-            $request->file('image')->storeAs('events', $filename);
+            // ✅ Fixed: storeAs with 'public' disk
+            $request->file('image')->storeAs('eventimages', $filename, 'public');
 
             $validated['image'] = $filename;
         }
@@ -193,15 +172,18 @@ class EventController extends Controller
 
         return redirect()->route('events.show', $event)->with('success', 'Event updated successfully.');
     }
-    //  Delete Event
+
+    // 7. Delete Event
     public function destroy(Event $event)
     {
         if (Auth::id() !== $event->user_id && !Auth::user()->is_admin) {
             abort(403);
         }
 
+        // Delete Image
         if ($event->image) {
-            Storage::delete('public/events/' . $event->image);
+            // ✅ Fixed path to match creation logic
+            Storage::disk('public')->delete('eventimages/' . $event->image);
         }
 
         $event->delete();

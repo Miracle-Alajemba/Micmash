@@ -7,6 +7,7 @@ use App\Http\Controllers\EventRsvpController;
 use App\Http\Controllers\EventLikeController;
 use App\Http\Controllers\EventCommentController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\TicketController; // ✅ KEEP THIS
 
 // Admin Controllers
 use App\Http\Controllers\Admin\AdminEventController;
@@ -51,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
     // Payment Routes
     Route::post('/pay/{event}', [PaymentController::class, 'initialize'])->name('payment.initialize');
     Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+
+    Route::get('/my-tickets', [TicketController::class, 'index'])->name('tickets.index');
 });
 
 /*
@@ -71,6 +74,7 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->name('admin.')->group(
     // Users
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/admin/events/{event}/attendees', [App\Http\Controllers\Admin\AdminEventController::class, 'attendees'])->name('admin.events.attendees');
 });
 // Speaker Management
 Route::get('/events/{event}/speakers/create', [App\Http\Controllers\EventSpeakerController::class, 'create'])->name('events.speakers.create');

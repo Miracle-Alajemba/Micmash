@@ -72,13 +72,6 @@ class Event extends Model
     }
     public function getTotalAttendeesAttribute()
     {
-        // 1. Count the main users (John, Sarah, Mike) = 3
-        $main_users = $this->rsvps->count();
-
-        // 2. Add up the numbers in the 'guests_count' column (2 + 0 + 3) = 5
-        $extra_guests = $this->rsvps->sum('guests_count');
-
-        // 3. Return the total (3 + 5) = 8
-        return $main_users + $extra_guests;
+        return $this->rsvps->count() + $this->rsvps->sum('guests_count');
     }
 }
