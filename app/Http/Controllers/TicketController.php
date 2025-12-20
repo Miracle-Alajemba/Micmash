@@ -12,17 +12,25 @@ class TicketController extends Controller
     // Display a listing of the user's tickets.
     public function index()
     {
-        //Get all events the user has joined
-        $tickets = EventRsvp::with('event')->where('user_id', Auth::id())->latest()->get();
-        //Attach payment info manually
+        // 1. Get all events the user joined
+        $tickets = EventRsvp::with('event')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        // 2. Manually attach payment info
         foreach ($tickets as $ticket) {
-            if ($ticket->event->price > 0) {
-                $ticket->payment = Payment::where('user_id', Auth::id())
-                    ->where('event_id', $ticket->event->id)
-                    ->where('status', 'successful')
-                    ->first();
-            }
+            // Find the payment record based on User + Event
+            // We removed the 'price > 0' check and 'status' check to be safe
+            $payment = Payment::where('user_id', Auth::id())
+                ->where('event_id', $ticket->event_id)
+                ->latest() // Get the newest one
+                ->first();
+
+            // Attach it to the ticket object so the View can read it
+            $ticket->setRelation('payment', $payment);
         }
+
         return view('tickets.index', compact('tickets'));
     }
 }

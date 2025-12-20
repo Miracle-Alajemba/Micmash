@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http; // ✅ Use Laravel's HTTP Client
 use Illuminate\Support\Facades\Log;
+use App\Models\Payment;
 
 class PaymentController extends Controller
 {
@@ -60,9 +61,9 @@ class PaymentController extends Controller
     }
 
     // 2. Callback (User comes back from Paystack)
+    // 2. Callback (User comes back from Paystack)
     public function callback(Request $request)
     {
-        // Get the 'reference' from the URL (Paystack sends it back)
         $reference = $request->query('reference');
 
         if (!$reference) {
@@ -70,7 +71,7 @@ class PaymentController extends Controller
         }
 
         try {
-            // Verify the Transaction with Paystack API
+            // Verify with Paystack
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . env('PAYSTACK_SECRET_KEY'),
                 'Content-Type'  => 'application/json',
@@ -80,14 +81,23 @@ class PaymentController extends Controller
 
             if ($response->successful() && $result['status'] && $result['data']['status'] === 'success') {
 
-                // Get the data we saved in metadata
                 $metadata = $result['data']['metadata'];
                 $eventId = $metadata['event_id'];
                 $guestsCount = $metadata['guests_count'];
+                $userId = $metadata['user_id']; // or use Auth::id()
+
+                // ✅ FIX: Save the Payment Record!
+                Payment::create([
+                    'user_id'   => $userId,
+                    'event_id'  => $eventId,
+                    'reference' => $result['data']['reference'],
+                    'amount'    => $result['data']['amount'] / 100, // Convert Kobo to Naira
+                    'status'    => 'success'
+                ]);
 
                 // Create the RSVP
                 EventRsvp::updateOrCreate(
-                    ['user_id' => Auth::id(), 'event_id' => $eventId],
+                    ['user_id' => $userId, 'event_id' => $eventId],
                     ['guests_count' => $guestsCount]
                 );
 

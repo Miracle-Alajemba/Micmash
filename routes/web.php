@@ -74,7 +74,8 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->name('admin.')->group(
     // Users
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
-    Route::get('/admin/events/{event}/attendees', [App\Http\Controllers\Admin\AdminEventController::class, 'attendees'])->name('admin.events.attendees');
+    // Route::get('/admin/events/{event}/attendees', [App\Http\Controllers\Admin\AdminEventController::class, 'attendees'])->name('admin.events.attendees');
+    Route::get('/events/{event}/attendees', [App\Http\Controllers\Admin\AdminEventController::class, 'attendees'])->name('events.attendees');
 });
 // Speaker Management
 Route::get('/events/{event}/speakers/create', [App\Http\Controllers\EventSpeakerController::class, 'create'])->name('events.speakers.create');

@@ -36,18 +36,28 @@ class AdminEventController extends Controller
         $event->update(['status' => 'rejected']);
         return back()->with('success', 'Event rejected.');
     }
-    public function attendees(Event $event)
+    public function attendees(Request $request, Event $event)
     {
-        // Get all people who RSVP'd
-        $attendees = EventRsvp::with('user')
-            ->where('event_id', $event->id)
-            ->get();
+        // 1. Start the query for this event
+        $query = EventRsvp::with('user')->where('event_id', $event->id);
 
-        // Attach payment info
+        // 2. Search Logic (Filter by Name or Email)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $attendees = $query->get();
+
+        // 3. Attach Payment Info (Same logic as TicketController)
         foreach ($attendees as $attendee) {
             if ($event->price > 0) {
                 $attendee->payment = Payment::where('user_id', $attendee->user_id)
                     ->where('event_id', $event->id)
+                    ->latest()
                     ->first();
             }
         }
