@@ -13,8 +13,7 @@ class AdminEventController extends Controller
     // List all events (pending first)
     public function index()
     {
-        // Keep ONLY this part.
-        // Changed 'simplepaginate' to 'paginate' for standard page numbers.
+       //Removing paginate to simplepaginate to fix issue with tailwind css
         $events = Event::with('user', 'category')
             ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
             ->latest()

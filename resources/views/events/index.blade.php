@@ -146,9 +146,9 @@
                 @endforelse
             </div>
 
-            <div class="mt-8">
+            {{-- <div class="mt-8">
                 {{ $events->withQueryString()->links() }}
-            </div>
+            </div> --}}
         </div>
     </div>
 </x-app-layout>
