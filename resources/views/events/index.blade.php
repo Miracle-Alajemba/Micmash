@@ -73,8 +73,7 @@
                             {{-- ROBUST IMAGE LOADING FIX --}}
                             @if ($event->image)
                                 <img src="{{ asset('storage/eventimages/' . $event->image) }}"
-                                    class="h-full w-full object-cover transition duration-500 "
-                                    alt="Event Image">
+                                    class="h-full w-full object-cover transition duration-500" alt="Event Image">
                             @else
                                 <div
                                     class="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 text-indigo-200">
@@ -146,9 +145,9 @@
                 @endforelse
             </div>
 
-            {{-- <div class="mt-8">
+            <div class="mt-8">
                 {{ $events->withQueryString()->links() }}
-            </div> --}}
+            </div>
         </div>
     </div>
 </x-app-layout>

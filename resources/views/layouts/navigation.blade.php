@@ -36,11 +36,11 @@
                     {{ __('My Tickets') }}
                 </x-nav-link>
                 <!-- 3. CREATE EVENT -->
-                @auth
+                {{-- @auth
                     <x-nav-link :href="route('events.create')" :active="request()->routeIs('events.create')">
                         {{ __('Create Event') }}
                     </x-nav-link>
-                @endauth
+                @endauth --}}
 
                 <!-- 4. ADMIN -->
                 @if (Auth::check() && Auth::user()->is_admin)

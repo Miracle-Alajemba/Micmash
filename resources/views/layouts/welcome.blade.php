@@ -46,12 +46,12 @@
                         <x-nav-link :href="route('about')" :active="request()->routeIs('events.index')">
                             {{ __('About us') }}
                         </x-nav-link>
-                        <!-- 3. CREATE EVENT -->
+                        {{-- <!-- 3. CREATE EVENT -->
                         @auth
                             <x-nav-link :href="route('events.create')" :active="request()->routeIs('events.create')">
                                 {{ __('Create Event') }}
                             </x-nav-link>
-                        @endauth
+                        @endauth --}}
 
                         <!-- 4. ADMIN -->
                         @if (Auth::check() && Auth::user()->is_admin)
