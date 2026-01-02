@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-bold tracking-tight text-gray-900">
+            <h2 class="text-2xl font-bold tracking-tight text-gray-100">
                 {{ __('My Tickets') }}
             </h2>
             <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600">

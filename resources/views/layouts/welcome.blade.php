@@ -26,7 +26,7 @@
                                 </svg>
                             </div>
                             <span
-                                class="text-xl font-bold tracking-tight text-gray-800 transition group-hover:text-indigo-700">Micmash</span>
+                                class="text-xl font-bold tracking-tight text-gray-700 transition group-hover:text-indigo-700">Micmash</span>
                         </a>
                     </div>
 
