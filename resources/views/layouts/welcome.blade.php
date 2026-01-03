@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <!-- Only show this to Logged In Users -->
 
     <head>
         <meta charset="utf-8">

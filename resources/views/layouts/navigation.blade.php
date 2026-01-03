@@ -28,20 +28,13 @@
                 <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.index')">
                     {{ __('Browse Events') }}
                 </x-nav-link>
-
                 <x-nav-link :href="route('about')" :active="request()->routeIs('home')">
                     {{ __('About us') }}
                 </x-nav-link>
-                <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.index')">
-                    {{ __('My Tickets') }}
-                </x-nav-link>
-                <!-- 3. CREATE EVENT -->
-                {{-- @auth
-                    <x-nav-link :href="route('events.create')" :active="request()->routeIs('events.create')">
-                        {{ __('Create Event') }}
-                    </x-nav-link>
-                @endauth --}}
-
+                @auth
+                    <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.index')">
+                        {{ __('My Tickets') }}
+                </x-nav-link> @endauth
                 <!-- 4. ADMIN -->
                 @if (Auth::check() && Auth::user()->is_admin)
                     <x-nav-link :href="route('admin.events.index')" :active="request()->routeIs('admin.*')">

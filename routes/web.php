@@ -52,8 +52,16 @@ Route::middleware(['auth'])->group(function () {
     // Payment Routes
     Route::post('/pay/{event}', [PaymentController::class, 'initialize'])->name('payment.initialize');
     Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
-
+    //This is the route to view user's tickets
     Route::get('/my-tickets', [TicketController::class, 'index'])->name('tickets.index');
+
+
+    // Speaker Management
+    Route::get('/events/{event}/speakers/create', [App\Http\Controllers\EventSpeakerController::class, 'create'])->name('events.speakers.create');
+    Route::post('/events/{event}/speakers', [App\Http\Controllers\EventSpeakerController::class, 'store'])->name('events.speakers.store');
+    Route::delete('/speakers/{speaker}', [App\Http\Controllers\EventSpeakerController::class, 'destroy'])->name('events.speakers.destroy');
+    Route::get('/speakers/{speaker}/edit', [App\Http\Controllers\EventSpeakerController::class, 'edit'])->name('events.speakers.edit');
+    Route::put('/speakers/{speaker}', [App\Http\Controllers\EventSpeakerController::class, 'update'])->name('events.speakers.update');
 });
 
 /*
@@ -62,7 +70,6 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')->middleware(['auth', 'is_admin'])->name('admin.')->group(function () {
-
     // Events
     Route::get('/events', [AdminEventController::class, 'index'])->name('events.index');
     Route::post('/events/{event}/approve', [AdminEventController::class, 'approve'])->name('events.approve');
@@ -77,13 +84,6 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->name('admin.')->group(
     // Route::get('/admin/events/{event}/attendees', [App\Http\Controllers\Admin\AdminEventController::class, 'attendees'])->name('admin.events.attendees');
     Route::get('/events/{event}/attendees', [App\Http\Controllers\Admin\AdminEventController::class, 'attendees'])->name('events.attendees');
 });
-// Speaker Management
-Route::get('/events/{event}/speakers/create', [App\Http\Controllers\EventSpeakerController::class, 'create'])->name('events.speakers.create');
-Route::post('/events/{event}/speakers', [App\Http\Controllers\EventSpeakerController::class, 'store'])->name('events.speakers.store');
-Route::delete('/speakers/{speaker}', [App\Http\Controllers\EventSpeakerController::class, 'destroy'])->name('events.speakers.destroy');
-Route::get('/speakers/{speaker}/edit', [App\Http\Controllers\EventSpeakerController::class, 'edit'])->name('events.speakers.edit');
-Route::put('/speakers/{speaker}', [App\Http\Controllers\EventSpeakerController::class, 'update'])->name('events.speakers.update');
-
 /*
 |--------------------------------------------------------------------------
 | Wildcard Route (Must be LAST)
