@@ -482,7 +482,7 @@
                 <div
                     class="mt-12 flex flex-col items-center justify-between border-t border-gray-500 pt-8 md:flex-row">
                     <p class="text-sm text-gray-100">
-                        &copy; {{ date('Y') }} Micmash. All rights reserved.
+                        &copy; {{ date('Y') }} Micmash. All rights reserved and all wrong reserved too.
                     </p>
                     <p class="text-white-600 mt-2 text-sm md:mt-0">
                         Designed with ❤️ in Laravel

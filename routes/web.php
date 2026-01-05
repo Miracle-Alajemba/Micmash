@@ -7,7 +7,7 @@ use App\Http\Controllers\EventRsvpController;
 use App\Http\Controllers\EventLikeController;
 use App\Http\Controllers\EventCommentController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\TicketController; // ✅ KEEP THIS
+use App\Http\Controllers\TicketController; 
 
 // Admin Controllers
 use App\Http\Controllers\Admin\AdminEventController;
