@@ -16,7 +16,7 @@ class EventCommentController extends Controller
     EventComment::create([
       'user_id' => Auth::id(),
       'event_id' => $event->id,
-      'content' => $request->content
+      'content' => $request->comment
     ]);
 
     return back()->with('success', 'Comment posted.');
