@@ -56,7 +56,7 @@
 
             </div>
 
-            <!-- Stats Section -->
+            {{-- <!-- Stats Section -->
             <div class="mt-10 rounded-lg bg-white p-8 shadow-sm">
                 <div
                     class="grid grid-cols-1 gap-6 divide-y divide-gray-200 text-center md:grid-cols-3 md:divide-x md:divide-y-0">
@@ -73,7 +73,7 @@
                         <div class="font-medium text-gray-500">Cities</div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
         </div>
     </div>
