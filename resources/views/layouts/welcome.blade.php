@@ -138,7 +138,7 @@
             <!-- MOBILE MENU (Responsive) -->
             <!-- ======================= -->
             <div :class="{ 'block': open, 'hidden': !open }"
-                class="hidden border-t border-gray-100 bg-white shadow-inner sm:hidden">
+                class="hidden border-t border-gray-700 bg-white shadow-inner sm:hidden">
 
                 <!-- Mobile Links -->
                 <div class="space-y-1 pb-3 pt-2">
