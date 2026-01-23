@@ -180,9 +180,9 @@
                         Now available in your city
                     </div>
                     <h1 class="mb-6 text-5xl font-extrabold tracking-tight text-gray-900 sm:text-7xl">
-                        Discover events that <br>
+                        Discover legit events  <br>
                         <span
-                            class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">matter
+                            class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">that matter
                             to you.</span>
                     </h1>
                     <p class="mt-6 text-lg leading-8 text-gray-600">
