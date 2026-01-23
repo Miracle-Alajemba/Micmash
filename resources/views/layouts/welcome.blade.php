@@ -46,7 +46,6 @@
                             class="text-sm font-semibold text-gray-600 transition hover:text-indigo-600">Discover</a>
                         <a href="{{ route('about') }}"
                             class="text-sm font-semibold text-gray-600 transition hover:text-indigo-600">About</a>
-
                         @auth
                             @if (Auth::user()->is_admin)
                                 <a href="{{ route('admin.events.index') }}"
@@ -63,7 +62,6 @@
                                 class="flex items-center gap-1 text-sm font-bold text-gray-900 transition hover:text-indigo-600">
                                 <span>+ Host Event</span>
                             </a>
-
                             <!-- Profile Dropdown -->
                             <div class="relative ml-3" x-data="{ open: false }">
                                 <button @click="open = !open" @click.away="open = false"
@@ -214,12 +212,12 @@
                         <dd class="order-first text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">2,000+</dd>
                     </div>
                     <div class="mx-auto flex max-w-xs flex-col gap-y-2">
-                        <dt class="text-base leading-7 text-gray-600">Community Members</dt>
+                        <dt class="text-base leading-7 text-gray-600">People That Attended</dt>
                         <dd class="order-first text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">85k+</dd>
                     </div>
                     <div class="mx-auto flex max-w-xs flex-col gap-y-2">
                         <dt class="text-base leading-7 text-gray-600">Tickets Sold</dt>
-                        <dd class="order-first text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">150k</dd>
+                        <dd class="order-first text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">120k</dd>
                     </div>
                 </dl>
             </div>
