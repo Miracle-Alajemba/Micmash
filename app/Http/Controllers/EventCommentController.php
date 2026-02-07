@@ -9,16 +9,17 @@ use Illuminate\Support\Facades\Auth;
 
 class EventCommentController extends Controller
 {
-  public function store(Request $request, Event $event)
-  {
-    $request->validate(['content' => 'required|string|max:500']);
+    public function store(Request $request, Event $event)
+    {
+        $request->validate(['content' => 'required|string|max:500']);
 
-    EventComment::create([
-      'user_id' => Auth::id(),
-      'event_id' => $event->id,
-      'content' => $request->comment
-    ]);
 
-    return back()->with('success', 'Comment posted.');
-  }
+        EventComment::create([
+            'user_id' => Auth::id(),
+            'event_id' => $event->id,
+            'content' => $request->content
+        ]);
+
+        return back()->with('success', 'Comment posted.');
+    }
 }

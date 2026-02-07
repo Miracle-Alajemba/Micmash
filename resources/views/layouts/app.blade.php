@@ -53,7 +53,7 @@
 
                         <!-- Column 1: Brand -->
                         <div class="space-y-4">
-                            <h3 class="text-2xl font-bold text-white">EventApp</h3>
+                            <h3 class="text-2xl font-bold text-white">Micmash</h3>
                             <p class="text-sm leading-relaxed text-gray-100">
                                 The best platform to discover local events,Join workshops, conferences, and meetups
                                 happening around you.
