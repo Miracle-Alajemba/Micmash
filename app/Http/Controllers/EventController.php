@@ -64,7 +64,7 @@ class EventController extends Controller
             'date'        => 'required|date|after:today',
             'time'        => 'required',
             'category_id' => 'required|exists:event_categories,id',
-            'image'       => ['required', File::types(['jpg', 'jpeg', 'webp', 'png'])->max(2048)],
+            'image'       => ['required', File::types(['jpg', 'jpeg', 'webp', 'png'])->max(10048)],
             'url'         => 'nullable|url',
             'price'       => 'nullable|numeric|min:0',
 

@@ -7,7 +7,7 @@ use App\Http\Controllers\EventRsvpController;
 use App\Http\Controllers\EventLikeController;
 use App\Http\Controllers\EventCommentController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\TicketController; 
+use App\Http\Controllers\TicketController;
 
 // Admin Controllers
 use App\Http\Controllers\Admin\AdminEventController;
@@ -23,8 +23,10 @@ use App\Http\Controllers\Admin\AdminUserController;
 Route::get('/', function () {
     return view('layouts.welcome');
 })->name('home');
+
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::view('/about', 'about')->name('about');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated User Routes (Must be logged in)
@@ -36,15 +38,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('events', EventController::class)->except(['index', 'show']);
 
     // Interactions
-    // Join / Update (POST)
     Route::post('/events/{event}/rsvp', [EventRsvpController::class, 'store'])->name('events.rsvp');
-    // Leave (DELETE)
     Route::delete('/events/{event}/rsvp', [EventRsvpController::class, 'destroy'])->name('events.rsvp.destroy');
     Route::post('/events/{event}/like', [EventLikeController::class, 'toggle'])->middleware('throttle:10,1')->name('events.like');
-
     Route::post('/events/{event}/comment', [EventCommentController::class, 'store'])->middleware('throttle:5,1')->name('events.comment');
 
-    // User Profile (Default Breeze routes)
+    // User Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -52,9 +51,10 @@ Route::middleware(['auth'])->group(function () {
     // Payment Routes
     Route::post('/pay/{event}', [PaymentController::class, 'initialize'])->name('payment.initialize');
     Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
-    //This is the route to view user's tickets
-    Route::get('/my-tickets', [TicketController::class, 'index'])->name('tickets.index');
 
+    // User Tickets
+    Route::get('/my-tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/{id}/download', [TicketController::class, 'download'])->name('tickets.download');
 
     // Speaker Management
     Route::get('/events/{event}/speakers/create', [App\Http\Controllers\EventSpeakerController::class, 'create'])->name('events.speakers.create');
@@ -75,22 +75,23 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->name('admin.')->group(
     Route::post('/events/{event}/approve', [AdminEventController::class, 'approve'])->name('events.approve');
     Route::post('/events/{event}/reject', [AdminEventController::class, 'reject'])->name('events.reject');
 
-    // Categories (This creates admin.categories.index)
+    // Categories
     Route::resource('categories', AdminCategoryController::class)->except(['show']);
 
     // Users
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
-    // Route::get('/admin/events/{event}/attendees', [App\Http\Controllers\Admin\AdminEventController::class, 'attendees'])->name('admin.events.attendees');
-    Route::get('/events/{event}/attendees', [App\Http\Controllers\Admin\AdminEventController::class, 'attendees'])->name('events.attendees');
+
+    // Admin event attendees
+    Route::get('/events/{event}/attendees', [AdminEventController::class, 'attendees'])->name('events.attendees');
+    Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
 });
+
 /*
 |--------------------------------------------------------------------------
 | Wildcard Route (Must be LAST)
 |--------------------------------------------------------------------------
 */
-// This catches /events/1, /events/2, etc.
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
-
 
 require __DIR__ . '/auth.php';

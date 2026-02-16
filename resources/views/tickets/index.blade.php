@@ -36,15 +36,22 @@
 
                             <!-- Status Badge (Floating) -->
                             <div class="absolute right-3 top-3">
-                                @if ($ticket->event->price > 0)
+                                @if ($ticket->event->price > 0 && optional($ticket->payment)->status === 'success')
+                                    {{-- Check payment status too --}}
                                     <span
                                         class="inline-flex items-center rounded-lg bg-white/90 px-2.5 py-1 text-xs font-bold text-gray-900 shadow-sm backdrop-blur-md">
                                         PAID
                                     </span>
-                                @else
+                                @elseif($ticket->event->price == 0)
                                     <span
                                         class="inline-flex items-center rounded-lg bg-white/90 px-2.5 py-1 text-xs font-bold text-indigo-600 shadow-sm backdrop-blur-md">
                                         FREE
+                                    </span>
+                                @else
+                                    {{-- Handle cases where payment is pending/failed for a paid event --}}
+                                    <span
+                                        class="inline-flex items-center rounded-lg bg-white/90 px-2.5 py-1 text-xs font-bold text-yellow-600 shadow-sm backdrop-blur-md">
+                                        PENDING
                                     </span>
                                 @endif
                             </div>
@@ -94,29 +101,37 @@
                                     <div class="text-right">
                                         <p class="text-[10px] font-medium uppercase text-gray-400">ID</p>
 
-                                        @if ($ticket->payment)
-                                            {{-- CASE 1: Payment Found --}}
+                                        @if ($ticket->payment && strtolower($ticket->payment->status) === 'success')
+                                            {{-- Check for successful payment --}}
+                                            {{-- CASE 1: Payment Found AND Successful --}}
                                             <p class="font-mono text-sm font-bold tracking-wide text-indigo-600">
                                                 #{{ strtoupper(substr($ticket->payment->reference, -6)) }}
                                             </p>
-                                            {{-- Optional: Show status if not success --}}
-                                            @if (strtolower($ticket->payment->status) !== 'success')
-                                                <p class="text-[10px] text-red-500">({{ $ticket->payment->status }})
-                                                </p>
-                                            @endif
                                         @elseif($ticket->event->price == 0)
                                             {{-- CASE 2: Free Event --}}
                                             <p class="text-xs font-bold text-gray-400">FREE PASS</p>
                                         @else
-                                            {{-- CASE 3: Paid Event but No Record --}}
-                                            <p class="text-xs font-bold text-red-500">Not Found</p>
+                                            {{-- CASE 3: Paid Event but No Successful Payment Record --}}
+                                            <p class="text-xs font-bold text-red-500">PAYMENT PENDING</p>
                                         @endif
                                     </div>
                                 </div>
                             </div>
-
                         </div>
+
+                        {{-- MOVED DOWNLOAD BUTTON: THIS IS THE CORRECT LOCATION --}}
+                        {{-- <div class="mt-auto flex items-center justify-center border-t border-gray-100 px-5 py-4">
+                            <a href="{{ route('tickets.download', ['id' => $ticket->id]) }}"
+                                class="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 transition hover:text-indigo-800">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download Ticket
+                            </a>
+                        </div> --}}
                     </div>
+                    <!-- END TICKET CARD -->
                 @empty
                     <!-- EMPTY STATE -->
                     <div

@@ -6,6 +6,9 @@ use App\Models\Payment;
 use App\Models\EventRsvp;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\Ticket;
 
 class TicketController extends Controller
 {
@@ -32,5 +35,26 @@ class TicketController extends Controller
         }
 
         return view('tickets.index', compact('tickets'));
+    }
+    // Download Ticket as PDF
+    public function download($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+
+        $payment = Payment::where('ticket_id', $ticket->id)->first();
+
+        $qrData = $payment ? $payment->reference : 'FREE-TICKET-' . $ticket->id;
+
+        // Generate QR as PNG base64
+        $qrcode = base64_encode(QrCode::format('png')->size(200)->generate($qrData));
+
+        // Load the PDF view
+        $pdf = Pdf::loadView('tickets.pdf', [
+            'ticket' => $ticket,
+            'payment' => $payment,
+            'qrcode' => $qrcode
+        ]);
+
+        return $pdf->download('EventTicket-' . $ticket->id . '.pdf');
     }
 }

@@ -7,13 +7,14 @@ use App\Models\Event;
 use App\Models\Payment;
 use App\Models\EventRsvp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminEventController extends Controller
 {
     // List all events (pending first)
     public function index()
     {
-       //Removing paginate to simplepaginate to fix issue with tailwind css
+        //Removing paginate to simplepaginate to fix issue with tailwind css
         $events = Event::with('user', 'category')
             ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
             ->latest()
@@ -62,5 +63,16 @@ class AdminEventController extends Controller
         }
 
         return view('admin.events.attendees', compact('event', 'attendees'));
+    }
+    public function destroy(Event $event)
+    {
+        // Optional: Delete the image from storage to save space
+        if ($event->image) {
+            Storage::disk('public')->delete('eventimages/' . $event->image);
+        }
+
+        $event->delete();
+
+        return back()->with('success', 'Event deleted successfully.');
     }
 }

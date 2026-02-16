@@ -8,28 +8,31 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EventFactory extends Factory
 {
-  public function definition(): array
-  {
-    return [
-      // Create a User or pick one if we override it
-      'user_id' => User::factory(),
+    public function definition(): array
+    {
+        // 1. Define the path where images should go
+        $path = storage_path('app/public/eventimages');
 
-      // Pick a random existing category, or create one if none exist
-      'category_id' => EventCategory::inRandomOrder()->first()->id ?? EventCategory::factory(),
+        // 2. Create directory if it doesn't exist (Safety check)
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
 
-      'title' => fake()->catchPhrase(), // Catchy titles like "Multi-layered client-server neural-net"
-      'description' => fake()->paragraphs(3, true), // Long dummy text
-      'location' => fake()->city() . ', ' . fake()->country(),
+        return [
+            'user_id' => User::factory(),
+            'category_id' => EventCategory::factory(),
+            'title' => $this->faker->sentence(4),
+            'description' => $this->faker->paragraph(3),
+            'location' => $this->faker->city,
+            'date' => $this->faker->dateTimeBetween('+1 week', '+1 year'),
+            'time' => $this->faker->time('H:i'),
+            'price' => $this->faker->randomElement([0, rand(1000, 20000)]),
+            'status' => 'approved',
+            'url' => $this->faker->url(),
 
-      // Random date between tomorrow and 4 months from now
-      'date' => fake()->dateTimeBetween('+1 day', '+4 months'),
-      'time' => fake()->time('H:i'),
-
-      // No image by default (to avoid broken links), or you can use null
-      'image' => null,
-
-      // 80% chance of being Approved, 10% Pending, 10% Rejected
-      'status' => fake()->randomElement(['approved', 'approved', 'approved', 'approved', 'pending', 'rejected']),
-    ];
-  }
+            // 👇 THIS DOWNLOADS A REAL IMAGE (640x480)
+            // It saves it to your folder and returns just the filename (e.g. 'b5c...jpg')
+            'image' => $this->faker->image($path, 640, 480, null, false),
+        ];
+    }
 }/*  */

@@ -31,7 +31,7 @@
                                 <th class="px-4 py-3 text-left">Guest List</th> {{-- Added Header --}}
                                 <th class="px-4 py-3 text-left">Actions</th>
                                 <th class="px-4 py-3 text-left">RSVPs</th>
-                                <th class="px-4 py-3 text-left">Likes</th>
+                                {{-- <th class="px-4 py-3 text-left">Likes</th> --}}
                                 <th class="px-4 py-3 text-left">Total Heads</th>
                             </tr>
                         </thead>
@@ -95,8 +95,21 @@
 
                                     {{-- Stats --}}
                                     <td class="px-4 py-3 text-sm text-gray-600">{{ $event->rsvps->count() }}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">{{ $event->likes->count() }}</td>
+
+                                    {{-- <td class="px-4 py-3 text-sm text-gray-600">{{ $event->likes->count() }}</td> --}}
                                     <td class="px-4 py-3 text-sm font-bold text-gray-800">{{ $event->total_attendees }}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST"
+                                            onsubmit="return confirm('Are you sure you want to delete this event?');">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit"
+                                                class="text-sm font-bold text-red-600 hover:text-red-900">
+                                                Delete
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @empty
