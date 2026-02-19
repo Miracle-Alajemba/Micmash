@@ -120,7 +120,7 @@
                         </div>
 
                         {{-- MOVED DOWNLOAD BUTTON: THIS IS THE CORRECT LOCATION --}}
-                        {{-- <div class="mt-auto flex items-center justify-center border-t border-gray-100 px-5 py-4">
+                        <div class="mt-auto flex items-center justify-center border-t border-gray-100 px-5 py-4">
                             <a href="{{ route('tickets.download', ['id' => $ticket->id]) }}"
                                 class="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 transition hover:text-indigo-800">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -129,7 +129,7 @@
                                 </svg>
                                 Download Ticket
                             </a>
-                        </div> --}}
+                        </div>
                     </div>
                     <!-- END TICKET CARD -->
                 @empty
