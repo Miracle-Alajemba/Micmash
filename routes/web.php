@@ -54,7 +54,7 @@ Route::middleware(['auth'])->group(function () {
 
     // User Tickets
     Route::get('/my-tickets', [TicketController::class, 'index'])->name('tickets.index');
-    Route::get('/tickets/{id}/download', [TicketController::class, 'download'])->name('tickets.download');
+    // Route::get('/tickets/{id}/download', [TicketController::class, 'download'])->name('tickets.download');
 
     // Speaker Management
     Route::get('/events/{event}/speakers/create', [App\Http\Controllers\EventSpeakerController::class, 'create'])->name('events.speakers.create');
