@@ -46,8 +46,12 @@ class TicketController extends Controller
 
         $qrData = $payment ? $payment->reference : 'FREE-TICKET-' . $ticket->id;
 
+        // ← Replace this part
         $qrcode = base64_encode(
-            QrCode::format('png')->size(200)->generate($qrData)
+            QrCode::format('png')
+                ->size(200)
+                ->backend('gd') // force GD backend
+                ->generate($qrData)
         );
 
         $pdf = Pdf::loadView('tickets.pdf', [
