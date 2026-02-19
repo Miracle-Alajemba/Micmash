@@ -45,19 +45,21 @@ class TicketController extends Controller
         // QR data
         $qrData = $payment ? $payment->reference : 'FREE-TICKET-' . $ticket->id;
 
-        // Generate QR code as base64
-        $qrcode = base64_encode(
-            QrCode::format('png')
+        // Generate QR code as SVG (doesn't require imagick or GD)
+        $qrcodeSvg = QrCode::format('svg')
                 ->size(200)
-                ->generate($qrData)
-        );
+                ->generate($qrData);
+        
+        // Convert SVG to data URI for embedding in PDF
+        $qrcodeDataUri = 'data:image/svg+xml;base64,' . base64_encode($qrcodeSvg);
 
         // Generate PDF
         $pdf = Pdf::loadView('tickets.pdf', [
             'ticket' => $ticket,
             'payment' => $payment,
-            'qrcode' => $qrcode
+            'qrcode' => $qrcodeDataUri
         ]);
 
         return $pdf->download('EventTicket-' . $ticket->id . '.pdf');
     }
+}

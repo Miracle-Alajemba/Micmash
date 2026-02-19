@@ -104,7 +104,7 @@
 
             <!-- QR Code -->
             <div class="qr-area">
-                <img src="data:image/png;base64, {!! $qrcode !!}" width="150">
+                <img src="{!! $qrcode !!}" width="150">
                 <p style="font-size: 10px; margin-top: 5px;">Scan at the venue entrance</p>
             </div>
 
