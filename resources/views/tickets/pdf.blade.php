@@ -167,9 +167,8 @@
             </div>
 
             <div class="info-row">
-                <div class="label">Attendee</div>
-                <div class="value">{{ $ticket->user->name }}</div>
-                <div class="guests-info">+ {{ $ticket->guests_count }} Guest{{ $ticket->guests_count != 1 ? 's' : '' }}</div>
+                <div class="label">Total Attending</div>
+                <div class="value">{{ $ticket->guests_count + 1 }} People</div>
             </div>
 
             <div style="margin-top: 25px;">
