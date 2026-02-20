@@ -4,64 +4,144 @@
     <head>
         <title>Event Ticket</title>
         <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
             body {
-                font-family: sans-serif;
-                color: #333;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: #2c1810;
+                background: linear-gradient(135deg, #fef5e7 0%, #d4a574 50%, #8b4513 100%);
+                min-height: 100vh;
+                padding: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .ticket-box {
-                border: 2px solid #333;
-                padding: 20px;
+                border: none;
+                padding: 45px;
                 width: 100%;
-                max-width: 600px;
+                max-width: 550px;
                 margin: 0 auto;
+                background: #fefdfb;
+                border-radius: 12px;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
             }
 
             .header {
-                border-bottom: 2px dashed #ccc;
-                padding-bottom: 20px;
-                margin-bottom: 20px;
+                border-bottom: 1px solid #e8d9c7;
+                padding-bottom: 30px;
+                margin-bottom: 35px;
+                text-align: center;
             }
 
             .title {
-                font-size: 24px;
-                font-weight: bold;
-                color: #4F46E5;
+                font-size: 28px;
+                font-weight: 600;
+                color: #8b4513;
+                text-align: center;
+                text-transform: uppercase;
+                font-family: 'Georgia', 'Times New Roman', serif;
+                letter-spacing: 0.5px;
+                margin-bottom: 12px;
+            }
+
+            .date-time {
+                font-size: 12px;
+                color: #6b5344;
+                margin-top: 8px;
             }
 
             .info-row {
-                margin-bottom: 10px;
+                margin-bottom: 22px;
+                padding: 10px 0;
+                border-bottom: 1px solid #f5ede8;
+            }
+
+            .info-row:last-of-type {
+                border-bottom: none;
             }
 
             .label {
-                font-size: 12px;
-                color: #666;
+                font-size: 10px;
+                color: #8b4513;
                 text-transform: uppercase;
+                font-weight: 600;
+                letter-spacing: 0.8px;
+                display: block;
+                margin-bottom: 4px;
+                opacity: 0.85;
             }
 
             .value {
                 font-size: 16px;
-                font-weight: bold;
+                font-weight: 500;
+                color: #2c1810;
             }
 
             .qr-area {
                 text-align: center;
-                margin-top: 30px;
+                margin-top: 40px;
+                padding-top: 30px;
+                border-top: 1px solid #e8d9c7;
+            }
+
+            .qr-area img {
+                width: 140px;
+                height: 140px;
+                border: none;
+                border-radius: 8px;
+                padding: 8px;
+                background: white;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+
+            .qr-text {
+                font-size: 10px;
+                color: #8b4513;
+                margin-top: 12px;
+                font-weight: 500;
+                letter-spacing: 0.3px;
             }
 
             .footer {
-                font-size: 10px;
+                font-size: 9px;
                 text-align: center;
-                margin-top: 20px;
-                color: #999;
+                margin-top: 30px;
+                color: #8b4513;
+                padding-top: 20px;
+                border-top: 1px solid #f5ede8;
+                opacity: 0.8;
             }
 
             .badge {
-                background: #eee;
-                padding: 5px 10px;
+                background: #fef5e7;
+                padding: 6px 14px;
                 border-radius: 4px;
-                font-size: 12px;
-                font-weight: bold;
+                font-size: 11px;
+                font-weight: 600;
+                color: #8b4513;
+                border: 1px solid #e8d9c7;
+                display: inline-block;
+                margin-top: 15px;
+                letter-spacing: 0.5px;
+            }
+
+            .guests-info {
+                font-size: 11px;
+                color: #8b4513;
+                margin-top: 4px;
+                opacity: 0.8;
+            }
+
+            .ref-info {
+                font-size: 10px;
+                color: #8b4513;
+                margin-top: 8px;
             }
         </style>
     </head>
@@ -72,11 +152,10 @@
             <!-- Header -->
             <div class="header">
                 <div class="title">{{ $ticket->event->title }}</div>
-                <div style="margin-top: 5px;">
+                <div class="date-time">
                     <span class="label">Date:</span>
                     <strong>{{ \Carbon\Carbon::parse($ticket->event->date)->format('M d, Y') }}</strong>
-                    &nbsp;|&nbsp;
-                    <span class="label">Time:</span>
+                    &nbsp;•&nbsp;
                     <strong>{{ \Carbon\Carbon::parse($ticket->event->time)->format('g:i A') }}</strong>
                 </div>
             </div>
@@ -90,26 +169,26 @@
             <div class="info-row">
                 <div class="label">Attendee</div>
                 <div class="value">{{ $ticket->user->name }}</div>
-                <div style="font-size: 12px;">(+ {{ $ticket->guests_count }} Guests)</div>
+                <div class="guests-info">+ {{ $ticket->guests_count }} Guest{{ $ticket->guests_count != 1 ? 's' : '' }}</div>
             </div>
 
-            <div class="info-row" style="margin-top: 20px;">
+            <div style="margin-top: 25px;">
                 <span class="badge">
                     {{ $payment ? 'PAID TICKET' : 'FREE ENTRY' }}
                 </span>
                 @if ($payment)
-                    <span class="label" style="margin-left: 10px;">Ref: #{{ strtoupper($payment->reference) }}</span>
+                    <div class="ref-info">Reference: <strong>#{{ strtoupper($payment->reference) }}</strong></div>
                 @endif
             </div>
 
             <!-- QR Code -->
             <div class="qr-area">
-                <img src="{!! $qrcode !!}" width="150">
-                <p style="font-size: 10px; margin-top: 5px;">Scan at the venue entrance</p>
+                <img src="{!! $qrcode !!}" alt="QR Code">
+                <p class="qr-text">Scan at venue entrance</p>
             </div>
 
             <div class="footer">
-                Generated by Micmash EventHub • {{ date('Y-m-d H:i') }}
+                Micmash EventHub • {{ date('M d, Y H:i') }}
             </div>
         </div>
 

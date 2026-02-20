@@ -47,9 +47,9 @@ class TicketController extends Controller
 
         // Generate QR code as SVG (doesn't require imagick or GD)
         $qrcodeSvg = QrCode::format('svg')
-                ->size(200)
-                ->generate($qrData);
-        
+            ->size(200)
+            ->generate($qrData);
+
         // Convert SVG to data URI for embedding in PDF
         $qrcodeDataUri = 'data:image/svg+xml;base64,' . base64_encode($qrcodeSvg);
 
