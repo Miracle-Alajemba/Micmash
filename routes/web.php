@@ -8,6 +8,7 @@ use App\Http\Controllers\EventLikeController;
 use App\Http\Controllers\EventCommentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\EventSpeakerController;
 
 // Admin Controllers
 use App\Http\Controllers\Admin\AdminEventController;
@@ -57,11 +58,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tickets/{id}/download', [TicketController::class, 'download'])->name('tickets.download');
 
     // Speaker Management
-    Route::get('/events/{event}/speakers/create', [App\Http\Controllers\EventSpeakerController::class, 'create'])->name('events.speakers.create');
-    Route::post('/events/{event}/speakers', [App\Http\Controllers\EventSpeakerController::class, 'store'])->name('events.speakers.store');
-    Route::delete('/speakers/{speaker}', [App\Http\Controllers\EventSpeakerController::class, 'destroy'])->name('events.speakers.destroy');
-    Route::get('/speakers/{speaker}/edit', [App\Http\Controllers\EventSpeakerController::class, 'edit'])->name('events.speakers.edit');
-    Route::put('/speakers/{speaker}', [App\Http\Controllers\EventSpeakerController::class, 'update'])->name('events.speakers.update');
+    Route::get('/events/{event}/speakers/create', [EventSpeakerController::class, 'create'])->name('events.speakers.create');
+    Route::post('/events/{event}/speakers', [EventSpeakerController::class, 'store'])->name('events.speakers.store');
+    Route::delete('/speakers/{speaker}', [EventSpeakerController::class, 'destroy'])->name('events.speakers.destroy');
+    Route::get('/speakers/{speaker}/edit', [EventSpeakerController::class, 'edit'])->name('events.speakers.edit');
+    Route::put('/speakers/{speaker}', [EventSpeakerController::class, 'update'])->name('events.speakers.update');
 });
 
 /*
