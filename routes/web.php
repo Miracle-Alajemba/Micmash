@@ -43,7 +43,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/events/{event}/rsvp', [EventRsvpController::class, 'destroy'])->name('events.rsvp.destroy');
     Route::post('/events/{event}/like', [EventLikeController::class, 'toggle'])->middleware('throttle:10,1')->name('events.like');
     Route::post('/events/{event}/comment', [EventCommentController::class, 'store'])->middleware('throttle:5,1')->name('events.comment');
-
     // User Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
