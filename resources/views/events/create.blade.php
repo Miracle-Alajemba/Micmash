@@ -124,7 +124,7 @@
                                     <label class="mb-2 block text-sm font-bold text-gray-700">Venue / Location</label>
                                     <input type="text" name="location" value="{{ old('location') }}"
                                         class="block w-full rounded-xl border-gray-300 bg-gray-50 p-3 shadow-sm transition-all focus:border-indigo-500 focus:bg-white focus:ring-indigo-500"
-                                        placeholder="e.g. Grand Hall, Lagos" required>
+                                        placeholder="e.g. Grand Hall, Texas" required>
                                 </div>
 
                                 <!-- Date & Time -->
