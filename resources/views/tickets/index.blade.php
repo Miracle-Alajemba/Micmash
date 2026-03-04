@@ -61,7 +61,7 @@
                         <div class="flex flex-1 flex-col p-5">
 
                             <!-- Date & Title -->
-                            <div class="mb-4">
+                            {{-- <div class="mb-4">
                                 <p class="mb-1 text-xs font-bold uppercase tracking-wider text-indigo-600">
                                     {{ \Carbon\Carbon::parse($ticket->event->date)->format('M d, Y') }} •
                                     {{ \Carbon\Carbon::parse($ticket->event->time)->format('g:i A') }}
@@ -75,7 +75,7 @@
                                 <p class="mt-1 line-clamp-1 text-sm text-gray-500">
                                     {{ $ticket->event->location }}
                                 </p>
-                            </div>
+                            </div> --}}
 
                             <!-- 3. FOOTER: TICKET INFO -->
                             <div class="mt-auto rounded-xl bg-gray-50 p-3 ring-1 ring-gray-100">
